@@ -9,22 +9,40 @@ const {
   passwordChangeEmail,
   passwordChangedEmail,
 } = require("../emails/user");
-const {
-  generateAuthTokens,
-  generateAccessToken,
-} = require("../middleware/auth");
+const { generateAuthTokens } = require("../middleware/auth");
 
 exports.SignUp = catchAsync(async (req, res, next) => {
   const user = new User(req.body);
   const tokens = await generateAuthTokens(user, res);
   user.token = tokens.refreshToken;
+  user.isVerified = false;
+  user.emailToken = crypto.randomBytes(64).toString("hex");
+
   await user.save({ runValidators: true });
-  await sendWelcomeEmail(user.email, user.name);
+  await sendWelcomeEmail(
+    user.email,
+    user.name,
+    user.emailToken,
+    req.headers.host
+  );
   res.status(200).send({
     refreshToken: tokens.refreshToken,
     accessToken: tokens.accessToken,
     user,
   });
+});
+
+exports.verification = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ emailToken: req.query.token });
+
+  if (!user) {
+    throw new error();
+  }
+
+  user.isVerified = true;
+  user.emailToken = null;
+  await user.save();
+  res.status(200).send();
 });
 
 exports.LogIn = catchAsync(async (req, res, next) => {

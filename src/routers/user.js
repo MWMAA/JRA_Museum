@@ -7,6 +7,7 @@ router.post("/SignUp", userRoutes.SignUp);
 router.post("/LogIn", userRoutes.LogIn);
 router.post("/LogOut", userRoutes.LogOut);
 router.post("/tokenRefresh", userRoutes.tokenRefresh);
+router.get("/emailVerification", userRoutes.verification);
 router.post("/forgotPassword", userRoutes.forgotPassword);
 router.patch("/resetPassword/:resetToken", userRoutes.resetPassword);
 router.patch("/updatePassword", auth, userRoutes.updatePassword);

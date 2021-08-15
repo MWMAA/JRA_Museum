@@ -47,10 +47,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Male", "Female"],
     },
-    token: { type: String },
+    token: String,
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    emailToken: String,
+    isVerified: Boolean,
   },
   {
     timestamps: true,
@@ -67,6 +69,7 @@ userSchema.methods.toJSON = function () {
   delete userObject.passwordResetToken;
   delete userObject.passwordResetExpires;
   delete userObject.token;
+  delete userObject.emailToken;
 
   return userObject;
 };
