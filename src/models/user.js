@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Male", "Female"],
     },
+    token: { type: String },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -65,6 +66,7 @@ userSchema.methods.toJSON = function () {
   delete userObject.passwordChangedAt;
   delete userObject.passwordResetToken;
   delete userObject.passwordResetExpires;
+  delete userObject.token;
 
   return userObject;
 };
@@ -80,6 +82,18 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
   if (!isMatch) {
     throw new Error("Unable to login!");
+  }
+
+  return user;
+};
+
+userSchema.statics.findByRefreshToken = async (token) => {
+  const user = await User.findOne({ token });
+
+  if (!user) {
+    throw new Error(
+      "Our Monkeys misplaced their bananas, please try again later!"
+    );
   }
 
   return user;
