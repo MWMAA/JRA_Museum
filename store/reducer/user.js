@@ -9,13 +9,15 @@ export const userReducer = (state = initialState, action) => {
     case "AUTHENTICATE":
       return {
         token: action.token,
-        userData: action.userId,
+        userData: action.userData,
         didTryAutoLogin: true,
       };
     case "LOGOUT":
-      return { ...initialState, didTryAutoLoginkey: false };
-    case "SET_DID_TRY_AL":
-      return { ...state, didTryAutoLoginkey: true };
+      return { ...initialState, didTryAutoLogin: false };
+    case "TOKEN_REFRESH":
+      return { ...state, token: action.accessToken };
+    case "AUTO_LOGIN_TRIED":
+      return { ...state, didTryAutoLogin: true };
     default:
       return state;
   }

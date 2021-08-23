@@ -7,11 +7,13 @@ import ReduxThunk from "redux-thunk";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { userReducer } from "./store/reducer/user";
+import { artifactReducer } from "./store/reducer/artifacts";
 import { View, Text, StyleSheet } from "react-native";
 import AppNavigator from "./Navigation/AppNavigator";
 
 const rootReducer = combineReducers({
   user: userReducer,
+  artifacts: artifactReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));

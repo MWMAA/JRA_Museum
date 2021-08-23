@@ -1,83 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import ArtifactCard from "../../components/ArtifactCard/ArtifactCard";
-import ArtifactForm from "../../components/ArtifactForm";
-
-const data = [
-  {
-    id: "1",
-    Present_location: "PELIZAEUS-MUSEUM",
-    Designation: "Seated figure of Sa-Hathor",
-    Category: "RECEPTACLE",
-    Description:
-      "This statue of Sa-Hathor set on a\
-      flat base shows him seated cross-legged.\
-      The arms and hands are placed flat on the thighs in the posture of prayer.\
-      The official is wearing a wig which falls onto his shoulders and a long kilt\
-      which completely covers his legs.",
-    Archaeological_Site: "UPPER EGYPT",
-    Materials: "NON ORGANIC",
-    Technique: "GENERAL TECHNIQUE:Â Â SCULPTURED",
-    Dating: "OLD KINGDOM",
-    Language: "EGYPTIAN",
-    imageUrl:
-      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cHlyYW1pZHxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
-  },
-  {
-    id: "2",
-    Present_location: "PELIZAEUS-MUSEUM",
-    Designation: "Seated figure of Sa-Hathor",
-    Category: "RECEPTACLE",
-    Description:
-      "This statue of Sa-Hathor set on a\
-      flat base shows him seated cross-legged.\
-      The arms and hands are placed flat on the thighs in the posture of prayer.\
-      The official is wearing a wig which falls onto his shoulders and a long kilt\
-      which completely covers his legs.",
-    Archaeological_Site: "UPPER EGYPT",
-    Materials: "NON ORGANIC",
-    Technique: "GENERAL TECHNIQUE:Â Â SCULPTURED",
-    Dating: "OLD KINGDOM",
-    Language: "EGYPTIAN",
-    imageUrl:
-      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cHlyYW1pZHxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
-  },
-  {
-    id: "3",
-    Present_location: "PELIZAEUS-MUSEUM",
-    Designation: "Seated figure of Sa-Hathor",
-    Category: "RECEPTACLE",
-    Description:
-      "This statue of Sa-Hathor set on a\
-      flat base shows him seated cross-legged.\
-      The arms and hands are placed flat on the thighs in the posture of prayer.\
-      The official is wearing a wig which falls onto his shoulders and a long kilt\
-      which completely covers his legs.",
-    Archaeological_Site: "UPPER EGYPT",
-    Materials: "NON ORGANIC",
-    Technique: "GENERAL TECHNIQUE:Â Â SCULPTURED",
-    Dating: "OLD KINGDOM",
-    Language: "EGYPTIAN",
-    imageUrl:
-      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cHlyYW1pZHxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80",
-  },
-];
+import * as artifactActions from "../../store/actions/artifacts";
+import { useDispatch, useSelector } from "react-redux";
 
 const ArtifactListScreen = (props) => {
-  const selectItemHandler = (id, name) => {
+  const Artifacts = useSelector((state) => state.artifacts.artifacts);
+  const dispatch = useDispatch();
+  const [skip, setSkip] = useState(0);
+
+  const selectItemHandler = (_id, name) => {
     props.navigation.navigate("Artifact Detail", {
-      artifactId: id,
+      artifactId: _id,
       artifactName: name,
     });
   };
 
+  useEffect(() => {
+    const getArtifacts = () => {
+      dispatch(artifactActions.fetchArtifacts(skip));
+      setSkip(skip + 5);
+    };
+    getArtifacts();
+  }, [dispatch]);
+
+  const fetchData = () => {
+    dispatch(artifactActions.fetchArtifacts(skip));
+    setSkip(skip + 5);
+  };
+
   return (
     <FlatList
-      data={data}
+      data={Artifacts}
+      keyExtractor={(item) => item.International_Inventory_number}
+      onEndReached={fetchData}
       renderItem={(itemData) => (
         <TouchableOpacity
           onPress={() => {
-            selectItemHandler(itemData.item.id, itemData.item.Designation);
+            selectItemHandler(itemData.item._id, itemData.item.Designation);
           }}
         >
           <ArtifactCard data={itemData.item} />

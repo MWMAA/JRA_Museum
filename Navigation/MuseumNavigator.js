@@ -1,16 +1,20 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Platform, SafeAreaView, Button, View } from "react-native";
+import { Platform } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
 
 import ArtifactDetailScreen from "../Screens/Artifacts/ArtifactDetailScreen";
 import ArtifactListScreen from "../Screens/Artifacts/ArtifactListScreen";
 import HomeScreen from "../Screens/HomeScreen";
+import CameraComponent from "../components/cameraComponent";
+import SettingsScreen, {
+  screenOptions as SettingScreeenOptions,
+} from "../Screens/SettingsScreen";
 
 const defaultNavOptions = {
   headerStyle: {
-    backgroundColor: Platform.OS === "android" ? "blue" : "",
+    backgroundColor: Platform.OS === "android" ? "white" : "",
   },
   headerTitleStyle: {
     fontFamily: "open-sans-bold",
@@ -18,12 +22,12 @@ const defaultNavOptions = {
   headerBackTitleStyle: {
     fontFamily: "open-sans",
   },
-  headerTintColor: Platform.OS === "android" ? "white" : "blue",
+  headerTintColor: Platform.OS === "android" ? "black" : "black",
 };
 
 const MuseumStackNavigator = createNativeStackNavigator();
 
-export const MuseumNavigator = () => {
+const StackNavigator = () => {
   return (
     <MuseumStackNavigator.Navigator screenOptions={defaultNavOptions}>
       <MuseumStackNavigator.Screen
@@ -42,5 +46,55 @@ export const MuseumNavigator = () => {
         // options={CartScreenOptions}
       />
     </MuseumStackNavigator.Navigator>
+  );
+};
+
+const tabBarOption = ({ route }) => ({
+  headerShown: false,
+  tabBarIcon: ({ focused, color, size }) => {
+    let iconName;
+
+    if (route.name === "Camera") {
+      iconName = "camera-outline";
+    } else if (route.name === "Museum") {
+      iconName = focused ? "home" : "home-outline";
+    } else if (route.name === "Settings") {
+      iconName = focused ? "list" : "list-outline";
+    }
+
+    // You can return any component that you like here!
+    return <Ionicons name={iconName} size={size} color={color} />;
+  },
+});
+
+const BottomDrawer = createBottomTabNavigator();
+export const MuseumNavigator = () => {
+  return (
+    <BottomDrawer.Navigator screenOptions={tabBarOption}>
+      <BottomDrawer.Screen name="Museum" component={StackNavigator} />
+      <BottomDrawer.Screen
+        name="Camera"
+        component={CameraComponent}
+        options={{
+          tabBarStyle: { display: "none" },
+          tabBarShowLabel: false,
+        }}
+      />
+      <BottomDrawer.Screen name="Settings" component={SettingsNavigator} />
+    </BottomDrawer.Navigator>
+  );
+};
+
+const SettingsStackNavigator = createNativeStackNavigator();
+
+export const SettingsNavigator = () => {
+  return (
+    <SettingsStackNavigator.Navigator screenOptions={defaultNavOptions}>
+      <SettingsStackNavigator.Screen
+        name="Configurations"
+        component={SettingsScreen}
+        options={SettingScreeenOptions}
+      />
+    </SettingsStackNavigator.Navigator>
   );
 };
