@@ -10,6 +10,7 @@ const {
   passwordChangedEmail,
 } = require("../emails/user");
 const { generateAuthTokens } = require("../middleware/auth");
+const jwt = require("jsonwebtoken");
 
 exports.SignUp = catchAsync(async (req, res, next) => {
   const user = new User(req.body);
@@ -48,6 +49,9 @@ exports.verification = catchAsync(async (req, res, next) => {
 exports.LogIn = catchAsync(async (req, res, next) => {
   const user = await User.findByCredentials(req.body.email, req.body.password);
   const tokens = await generateAuthTokens(user, res);
+
+  user.token = tokens.refreshToken;
+  await user.save();
   res.status(200).send({
     refreshToken: tokens.refreshToken,
     accessToken: tokens.accessToken,
@@ -64,10 +68,10 @@ exports.LogOut = catchAsync(async (req, res, next) => {
 });
 
 exports.tokenRefresh = catchAsync(async (req, res, next) => {
-  const refreshToken = req.body.refreshToken;
-  if (refreshToken == null) return res.sendStatus(401);
-  const decoded = jwt.verify(refreshToken, process.env.JWT_ACCESS_SECRET);
-  const user = await User.findByRefreshToken(decoded._id);
+  const refreshToken = req.header("Authorization").replace("Bearer ", "");
+  if (refreshToken === null) return res.sendStatus(401);
+  // jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+  const user = await User.findByRefreshToken(refreshToken);
 
   if (!user) {
     throw new error();
@@ -80,7 +84,8 @@ exports.tokenRefresh = catchAsync(async (req, res, next) => {
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
-  return accessToken;
+
+  res.send({ accessToken, user });
 });
 
 exports.readUser = catchAsync(async (req, res, next) => {
@@ -133,7 +138,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   await sharp(req.file.buffer)
     .resize({ width: 500, height: 500 })
-    .png()
+    .png({ quality: 70, compressionLevel: 3 })
     .toFile("./public/" + `${req.user.avatar}`)
     .then(console.log("image saved"))
     .catch((e) => console.log(e));

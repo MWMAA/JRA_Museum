@@ -1,17 +1,21 @@
 const express = require("express");
 const { auth, restrictTo } = require("../middleware/auth");
 const router = new express.Router();
-const artifactRoutes = require("../controllers/artifactController");
+const artifactController = require("../controllers/artifactController");
 
 router
   .route("/artifacts")
-  .post(auth, artifactRoutes.createArtifact)
-  .get(auth, artifactRoutes.readArtifacts);
+  .post(auth, artifactController.createArtifact)
+  .get(auth, artifactController.readArtifacts);
 
 router
   .route("/artifacts/:id")
-  .get(auth, artifactRoutes.readArtifact)
-  .patch(auth, restrictTo("editor", "admin"), artifactRoutes.UpdateArtifact)
-  .delete(auth, restrictTo("editor", "admin"), artifactRoutes.DeleteArtifact);
+  .get(auth, artifactController.readArtifact)
+  .patch(auth, restrictTo("editor", "admin"), artifactController.UpdateArtifact)
+  .delete(
+    auth,
+    restrictTo("editor", "admin"),
+    artifactController.DeleteArtifact
+  );
 
 module.exports = router;

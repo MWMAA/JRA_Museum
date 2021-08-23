@@ -11,6 +11,11 @@ const artifactSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    Inventory_number: {
+      type: String,
+      trim: true,
+    },
+    Image: { type: String },
     Category: {
       type: String,
       required: true,
@@ -128,5 +133,12 @@ const artifactSchema = new mongoose.Schema(
 );
 
 const artifact = mongoose.model("artifact", artifactSchema);
+
+artifactSchema.methods.toJSON = function () {
+  const artifact = this;
+  const artifactObject = artifact.toObject();
+
+  return artifactObject;
+};
 
 module.exports = artifact;
